@@ -1,6 +1,6 @@
 import socket
 import numpy as np
-from typing import Iterable
+from typing import Iterable, Sequence
 
 """
 Returns a list of data streams for each device, e.g.
@@ -27,7 +27,7 @@ That's what a data frame is:
 """
 
 
-def capture_data_stream(ports: Iterable):
+def capture_raw_streams(ports: Iterable) -> list[list[str]]:
     if len(set(ports)) != len(ports):
         raise ValueError('Ports have to be unique.')
 
@@ -42,7 +42,7 @@ def capture_data_stream(ports: Iterable):
 
         sockets.append(s)
 
-    raw_data = [[] for _ in ports]
+    streams = [[] for _ in ports]
 
     # Wait for inputs - synchronize them
     for s in sockets:
@@ -60,37 +60,31 @@ def capture_data_stream(ports: Iterable):
         try:
             for i, s in enumerate(sockets):
                 message, address = s.recvfrom(8192)
-                raw_data[i].append(message.decode('utf-8'))
+                streams[i].append(message.decode('utf-8'))
 
         except socket.timeout:
             break
 
     for i, s in enumerate(sockets):
-        with open('raw_data/raw_' + str(i) + '.csv', 'w') as file_out:
-            file_out.write('\n'.join(raw_data[i]))
+        with open('data/raw_' + str(i) + '.csv', 'w') as file_out:
+            file_out.write('\n'.join(streams[i]))
 
-    return raw_data
+    return streams
 
 
 # Returns a tuple of sensor data (x, y, z), extracted from a string data row
 # 3 - Acclerometer, 4 - Gyroscope, 5 - Magnetic Field, 82 - Linear Accel., 84 - Rotation Vect.
-def extract_sensor_data(data_row: str, sensor_number: int):
-    r = data_row.split(',')
+def extract_sensor_data(frame: Sequence, sensor_number: int):
 
     try:
-        i = r.index(str(sensor_number))
+        i = frame.index(str(sensor_number))
 
-        sensor_data = r[i + 1: i + 4]
+        sensor_data = frame[i + 1: i + 4]
 
-        return (float(x) for x in sensor_data)
+        return [float(x) for x in sensor_data]
 
     except ValueError:
         raise ValueError('Cant find a sensor data in the data stream.')
-
-
-def extract_timestamp(data_row: str):
-    r = data_row.split(',')
-    return float(r[0])
 
 
 def avg_rate(time_serie):
@@ -104,17 +98,27 @@ def avg_rate(time_serie):
     return 1 / avg_step
 
 
-def process_raw_data(raw_data):
-    data = {'timestamp': [], 'acc': [], 'omega': [], 'mag': []}
+def process_raw_stream(raw_stream):
+    stream = {'timestamp': [], 'acc': [], 'omega': [], 'mag': []}
 
-    for row in raw_data:
-        data['timestamp'].append(extract_timestamp(row))
-        data['acc'].append(extract_sensor_data(row, 82))
-        data['omega'].append(extract_sensor_data(row, 84))
-        data['mag'].append(extract_sensor_data(row, 5))
+    for row in raw_stream:
+        frame = [s.strip() for s in row.split(',')]
+        stream['timestamp'].append(float(frame[0]))
+        stream['acc'].append(extract_sensor_data(frame, 82))
+        stream['omega'].append(extract_sensor_data(frame, 84))
+        stream['mag'].append(extract_sensor_data(frame, 5))
 
-    data['rate'] = int(avg_rate(data['timestamp']))
+    stream['rate'] = int(avg_rate(stream['timestamp']))
 
-    data['omega'] = np.array(data['omega'], dtype=np.float32)
+    stream['omega'] = np.array(stream['omega'], dtype=np.float32)
 
-    return data
+    return stream
+
+
+def capture_imu_streams(ports):
+    streams = capture_raw_streams(ports)
+
+    for i in range(len(streams)):
+        streams[i] = process_raw_stream(streams[i])
+
+    return streams

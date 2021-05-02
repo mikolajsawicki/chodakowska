@@ -10,7 +10,7 @@ def visualize(quaternions, rate):
     orientation(quaternions, 'data/animation.mp4', 'The visualisation of captured quaternions', deltaT=1000. / rate)
 
 
-def data_to_quat(data):
+def imu_to_quaternions(data):
     initial_orientation = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
 
     sensor = MyOwnSensor(in_data=data, R_init=initial_orientation)
