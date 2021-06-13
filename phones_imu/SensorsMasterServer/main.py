@@ -1,7 +1,6 @@
 import keyboard
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
-import threading
 from blender_interface import Packet, send_packet
 from Phone import Phone
 from time import sleep
