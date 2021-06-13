@@ -2,7 +2,9 @@ import keyboard
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
 import threading
-from blender_interface import send_to_blender
+from blender_interface import Packet, send_packet
+from Phone import Phone
+from time import sleep
 
 """
 Very simple HTTP server in python for logging requests
@@ -15,7 +17,35 @@ command = "STOP"
 phones_connected = []
 
 
+def send_to_blender(data):
+    # Decode from UTF-16-LE to utf-8
+    data = data.replace(b'\x00', b'')
+
+    lines = data.decode('utf-8').split('\n')
+
+    print("The transfer has started.")
+
+    print([str(i) + ": " + line for i, line in enumerate(lines[:6])])
+    label = lines[4]
+
+    # Ignore the preambule and content after the message
+    for line in lines[5:-3]:
+        # Send a packet
+
+        quaternions = [float(q) for q in line.split(' ')[1:5]]
+
+        if len(quaternions) == 4:
+            p = Packet(label, quaternions)
+            send_packet(p)
+            # print('Packet ' + str(p.quaternions) + ' has been sent.')
+
+            sleep(0.05)
+
+    print("The transfer has stopped.")
+
+
 class S(BaseHTTPRequestHandler):
+
     def _set_response(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -23,7 +53,12 @@ class S(BaseHTTPRequestHandler):
 
     def do_GET(self):
         # logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
-        logging.info("GET")
+        # logging.info("GET")
+        client_ip = self.client_address[0]
+
+        if client_ip not in [phone.ip for phone in phones_connected]:
+            phones_connected.append(Phone(client_ip, ''))
+
         self._set_response()
 
         self.wfile.write(bytes(command + '\n', "utf-8"))
