@@ -1,11 +1,8 @@
-from time import sleep
 import keyboard
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
 import threading
-
-from Packet import Packet
-from blender_interface import send_packet
+from blender_interface import send_to_blender
 
 """
 Very simple HTTP server in python for logging requests
@@ -15,46 +12,7 @@ Usage::
 
 command = "STOP"
 
-
-def get_command():
-    global command
-
-    while True:
-        if keyboard.is_pressed('q'):
-            command = "STOP"
-            print(command)
-        elif keyboard.is_pressed('s'):
-            command = "START"
-            print(command)
-
-        sleep(0.05)
-
-
-def send_to_blender(data):
-    # Decode from UTF-16-LE to utf-8
-    data = data.replace(b'\x00', b'')
-
-    lines = data.decode('utf-8').split('\n')
-
-    print("The transfer has started.")
-
-    print([str(i) + ": " + line for i, line in enumerate(lines[:6])])
-    label = lines[4]
-
-    # Ignore the preambule and content after the message
-    for line in lines[5:-3]:
-        # Send a packet
-
-        quaternions = [float(q) for q in line.split(' ')[1:5]]
-
-        if len(quaternions) == 4:
-            p = Packet(label, quaternions)
-            send_packet(p)
-            #print('Packet ' + str(p.quaternions) + ' has been sent.')
-
-            sleep(0.05)
-
-    print("The transfer has stopped.")
+phones_connected = []
 
 
 class S(BaseHTTPRequestHandler):
@@ -65,7 +23,7 @@ class S(BaseHTTPRequestHandler):
 
     def do_GET(self):
         # logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
-        logging.info("GET");
+        logging.info("GET")
         self._set_response()
 
         self.wfile.write(bytes(command + '\n', "utf-8"))
@@ -96,12 +54,17 @@ def run(server_class=HTTPServer, handler_class=S, port=8080):
     logging.info('Stopping httpd...\n')
 
 
+def set_command(cmd):
+    global command
+
+    command = cmd
+
+
 if __name__ == '__main__':
     from sys import argv
 
-    command_listener = threading.Thread(target=get_command)
-    command_listener.setDaemon(True)
-    command_listener.start()
+    keyboard.on_press_key("q", lambda _: set_command('STOP'))
+    keyboard.on_press_key("s", lambda _: set_command('START'))
 
     if len(argv) == 2:
         run(port=int(argv[1]))

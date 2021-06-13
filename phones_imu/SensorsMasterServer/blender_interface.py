@@ -23,9 +23,10 @@
 
 import socket
 import time
-from .copp_server.osc4py3_buildparse import oscbuildparse as oscparse
+from copp_server.osc4py3_buildparse import oscbuildparse as oscparse
+from time import sleep
 
-from .Packet import Packet
+from Packet import Packet
 
 port = 6565
 server_address = ('localhost', port)
@@ -50,6 +51,33 @@ def send_packet(packet: Packet):
     raw_bun = oscparse.encode_packet(bun)
 
     sock.sendto(raw_bun, server_address)
+
+
+def send_to_blender(data):
+    # Decode from UTF-16-LE to utf-8
+    data = data.replace(b'\x00', b'')
+
+    lines = data.decode('utf-8').split('\n')
+
+    print("The transfer has started.")
+
+    print([str(i) + ": " + line for i, line in enumerate(lines[:6])])
+    label = lines[4]
+
+    # Ignore the preambule and content after the message
+    for line in lines[5:-3]:
+        # Send a packet
+
+        quaternions = [float(q) for q in line.split(' ')[1:5]]
+
+        if len(quaternions) == 4:
+            p = Packet(label, quaternions)
+            send_packet(p)
+            # print('Packet ' + str(p.quaternions) + ' has been sent.')
+
+            sleep(0.05)
+
+    print("The transfer has stopped.")
 
 
 def dispose():
