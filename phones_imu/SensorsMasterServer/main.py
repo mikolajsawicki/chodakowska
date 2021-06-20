@@ -4,6 +4,7 @@ import logging
 from blender_interface import Packet, send_packet
 from Phone import Phone
 from time import sleep
+from IMUSessionsManager import IMUSessionsManager
 
 """
 Very simple HTTP server in python for logging requests
@@ -13,34 +14,34 @@ Usage::
 
 command = "STOP"
 
-phones_connected = []
+merger = IMUSessionsManager()
 
 
-def send_to_blender(data):
+def to_imu_packets(data) -> list[Packet]:
+    packets = list()
+
     # Decode from UTF-16-LE to utf-8
     data = data.replace(b'\x00', b'')
 
     lines = data.decode('utf-8').split('\n')
 
-    print("The transfer has started.")
-
-    print([str(i) + ": " + line for i, line in enumerate(lines[:6])])
     label = lines[4]
 
     # Ignore the preambule and content after the message
     for line in lines[5:-3]:
-        # Send a packet
 
-        quaternions = [float(q) for q in line.split(' ')[1:5]]
+        # Convert a message line to a list of floats for creating a valid packet
+        packet_raw = [float(q) for q in line.split(' ') if q]
 
-        if len(quaternions) == 4:
-            p = Packet(label, quaternions)
-            send_packet(p)
-            # print('Packet ' + str(p.quaternions) + ' has been sent.')
+        if len(packet_raw) == 5:
+            timestamp = packet_raw[0]
 
-            sleep(0.05)
+            quaternions = packet_raw[1:5]
 
-    print("The transfer has stopped.")
+            p = Packet(label, quaternions, timestamp)
+            packets.append(p)
+
+    return packets
 
 
 class S(BaseHTTPRequestHandler):
@@ -55,8 +56,8 @@ class S(BaseHTTPRequestHandler):
         # logging.info("GET")
         client_ip = self.client_address[0]
 
-        if client_ip not in [phone.ip for phone in phones_connected]:
-            phones_connected.append(Phone(client_ip, ''))
+        if client_ip not in [phone.ip for phone in merger.phones]:
+            merger.phones.append(Phone(client_ip, ''))
 
         self._set_response()
 
@@ -69,7 +70,7 @@ class S(BaseHTTPRequestHandler):
         logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
                      str(self.path), str(self.headers), post_data.decode('utf-8'))
 
-        send_to_blender(post_data)
+        merger.add_session(to_imu_packets(post_data))
 
         self._set_response()
         self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
