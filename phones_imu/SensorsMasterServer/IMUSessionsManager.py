@@ -4,6 +4,10 @@ from Packet import Packet
 import Phone
 from blender_interface import send_packet
 from datetime import datetime
+import os
+
+
+SESSIONS_DIR = 'sessions'
 
 
 def send_packets(packets):
@@ -19,6 +23,10 @@ def send_packets(packets):
 
 
 def packets_save_to_file(packets):
+
+    if not os.path.exists(SESSIONS_DIR):
+        os.mkdir(SESSIONS_DIR)
+
     filename = 'session_' + datetime.now().strftime('%d_%m_%Y_%H:%M:%S') + '.txt'
 
     txt = ''
@@ -26,7 +34,7 @@ def packets_save_to_file(packets):
     for p in packets:
         txt += str(p) + '\n'
 
-    with open(filename, 'w') as file:
+    with open(os.path.join(SESSIONS_DIR, filename), 'w') as file:
         file.write(txt)
 
 
