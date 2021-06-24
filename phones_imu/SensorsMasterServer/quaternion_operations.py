@@ -53,3 +53,13 @@ def rotate90z(quat):
                         [0, 0, 1]])
     r3 = rotate(quat, r2)
     return r3.as_quat().tolist()
+
+
+def swap_axis(quat):
+    r1 = R.from_quat(quat)
+    l = r1.as_euler('xyz', degrees=True).tolist()
+    z = list[2]
+    x = list[0]
+    l[2] = x
+    l[0] = z
+    return l
