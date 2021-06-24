@@ -62,4 +62,5 @@ def swap_axis(quat):
     x = list[0]
     l[2] = x
     l[0] = z
-    return l
+    r1 = R.from_euler(l)
+    return r1.as_quat().tolist()
