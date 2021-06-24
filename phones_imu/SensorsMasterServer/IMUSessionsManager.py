@@ -3,6 +3,31 @@ from time import sleep
 from Packet import Packet
 import Phone
 from blender_interface import send_packet
+from datetime import datetime
+
+
+def send_packets(packets):
+    for i, packet in enumerate(packets):
+        send_packet(packet)
+
+        sleep(0.02)
+
+        if i > 0 and i % 150 == 0:
+            print(str(i) + ' packets have been sent')
+
+    print(str(len(packets)) + ' packets have been sent')
+
+
+def packets_save_to_file(packets):
+    filename = 'session_' + datetime.now().strftime('%d_%m_%Y_%H:%M:%S') + '.txt'
+
+    txt = ''
+
+    for p in packets:
+        txt += str(p) + '\n'
+
+    with open(filename, 'w') as file:
+        file.write(txt)
 
 
 class IMUSessionsManager:
@@ -16,24 +41,14 @@ class IMUSessionsManager:
 
         # A session for each phone has been created. It's time to send the whole data to blender.
         if len(self.imu_sessions) == len(self.phones):
-            self.send_packets()
+
+            packets = self.merge_sessions()
+
+            send_packets(packets)
+
+            packets_save_to_file(packets)
 
             self.imu_sessions.clear()
-
-
-    def send_packets(self):
-        packets = self.merge_sessions()
-
-
-        for i, packet in enumerate(packets):
-            send_packet(packet)
-
-            sleep(0.02)
-
-            if i > 0 and i % 150 == 0:
-                print(str(i) + ' packets have been sent')
-
-        print(str(len(packets)) + ' packets have been sent')
 
     def merge_sessions(self):
         #self.cut_shift()
