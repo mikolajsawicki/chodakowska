@@ -3,7 +3,6 @@ class Packet:
         self.timestamp = timestamp
         self.label = label
 
-        # Zamień w kwaternionach oś Y i Z - "obrócimy" w ten sposób telefon
         self.quaternions = quaternions
 
     def __str__(self):
