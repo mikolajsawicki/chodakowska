@@ -40,7 +40,7 @@ def send_packets(packets):
 
     # Rotate the quaternions - for compatibility with Blender addon
     for i, packet in enumerate(packets):
-        packets[i] = rotate180z(packet)
+        packets[i].quaternion = rotate180z(packet.quaternion)
 
     for i, packet in enumerate(packets):
         send_packet(packet)
