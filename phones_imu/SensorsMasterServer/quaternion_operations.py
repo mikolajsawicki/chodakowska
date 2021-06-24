@@ -23,7 +23,7 @@ def rotate180y(quat):
     return r3
 
 
-def rotate180x(quat):
+def rotate180z(quat):
     r2 = R.from_matrix([[-1, 0, 0],
                         [0, -1, 0],
                         [0, 0, 1]])
