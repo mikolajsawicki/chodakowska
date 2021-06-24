@@ -26,12 +26,26 @@ import time
 from copp_server.osc4py3_buildparse import oscbuildparse as oscparse
 
 from Packet import Packet
+from time import sleep
+
 
 
 port = 6565
 server_address = ('localhost', port)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+def send_packets(packets):
+    for i, packet in enumerate(packets):
+        send_packet(packet)
+
+        sleep(0.02)
+
+        if i > 0 and i % 150 == 0:
+            print(str(i) + ' packets have been sent')
+
+    print(str(len(packets)) + ' packets have been sent')
 
 
 def send_packet(packet: Packet):

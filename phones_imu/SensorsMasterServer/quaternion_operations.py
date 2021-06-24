@@ -12,7 +12,7 @@ def rotate180x(quat):
                         [0, -1, 0],
                         [0, 0, -1]])
     r3 = rotate(quat, r2)
-    return r3
+    return r3.as_quat().tolist()
 
 
 def rotate180y(quat):
@@ -20,7 +20,7 @@ def rotate180y(quat):
                         [0, 1, 0],
                         [0, 0, -1]])
     r3 = rotate(quat, r2)
-    return r3
+    return r3.as_quat().tolist()
 
 
 def rotate180z(quat):
@@ -28,7 +28,7 @@ def rotate180z(quat):
                         [0, -1, 0],
                         [0, 0, 1]])
     r3 = rotate(quat, r2)
-    return r3
+    return r3.as_quat().tolist()
 
 
 def rotate90x(quat):
@@ -36,7 +36,7 @@ def rotate90x(quat):
                         [0, 0, -1],
                         [0, 1, 0]])
     r3 = rotate(quat, r2)
-    return r3
+    return r3.as_quat().tolist()
 
 
 def rotate90y(quat):
@@ -44,7 +44,7 @@ def rotate90y(quat):
                         [0, 1, 0],
                         [-1, 0, 0]])
     r3 = rotate(quat, r2)
-    return r3
+    return r3.as_quat().tolist()
 
 
 def rotate90z(quat):
@@ -52,4 +52,4 @@ def rotate90z(quat):
                         [1, 0, 0],
                         [0, 0, 1]])
     r3 = rotate(quat, r2)
-    return r3
+    return r3.as_quat().tolist()

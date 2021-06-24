@@ -1,25 +1,11 @@
-from time import sleep
-
 from Packet import Packet
 import Phone
-from blender_interface import send_packet
+from blender_interface import send_packets
 from datetime import datetime
 import os
 
 
 SESSIONS_DIR = 'sessions'
-
-
-def send_packets(packets):
-    for i, packet in enumerate(packets):
-        send_packet(packet)
-
-        sleep(0.02)
-
-        if i > 0 and i % 150 == 0:
-            print(str(i) + ' packets have been sent')
-
-    print(str(len(packets)) + ' packets have been sent')
 
 
 def save_packets_to_file(packets):
