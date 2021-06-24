@@ -1,13 +1,13 @@
 class Packet:
-    def __init__(self, label: str, quaternions: list[float], timestamp):
+    def __init__(self, label: str, quaternion: list[float], timestamp):
         self.timestamp = timestamp
         self.label = label
 
-        self.quaternions = quaternions
+        self.quaternion = quaternion
 
     def __str__(self):
-        quaternions_str = ' '.join([str(q) for q in self.quaternions])
+        quaternion_str = ' '.join([str(q) for q in self.quaternion])
 
-        elements = [str(self.timestamp), self.label, quaternions_str]
+        elements = [str(self.timestamp), self.label, quaternion_str]
 
         return ' '.join(elements)

@@ -41,7 +41,7 @@ def send_packet(packet: Packet):
     test_target = "q"
     first_msg_addr = "/%%/Chordata/" + test_target
 
-    msgs = [oscparse.OSCMessage('/%/{}'.format(packet.label), ',ffff', packet.quaternions)]
+    msgs = [oscparse.OSCMessage('/%/{}'.format(packet.label), ',ffff', packet.quaternion)]
 
     first_msg = [oscparse.OSCMessage(first_msg_addr, ",N", [None])]
 

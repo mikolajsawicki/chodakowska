@@ -43,9 +43,9 @@ def to_imu_packets(data) -> list[Packet]:
         if len(packet_raw) == 5:
             timestamp = packet_raw[0]
 
-            quaternions = packet_raw[1:5]
+            quaternion = packet_raw[1:5]
 
-            p = Packet(label, quaternions, int(timestamp))
+            p = Packet(label, quaternion, int(timestamp))
             packets.append(p)
 
     return packets

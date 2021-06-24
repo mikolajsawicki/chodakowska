@@ -47,9 +47,9 @@ def read_packets_from_file(filename):
     for line in lines:
         packet_raw = line.split(' ')
 
-        quaternions = [float(q) for q in packet_raw[2:]]
+        quaternion = [float(q) for q in packet_raw[2:]]
 
-        packets.append(Packet(packet_raw[1], quaternions, packet_raw[0]))
+        packets.append(Packet(packet_raw[1], quaternion, packet_raw[0]))
 
 
     print(str(len(packets)) + ' packets have been read.')
