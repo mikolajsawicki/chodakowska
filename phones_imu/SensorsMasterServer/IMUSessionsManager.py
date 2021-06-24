@@ -22,7 +22,7 @@ def send_packets(packets):
     print(str(len(packets)) + ' packets have been sent')
 
 
-def packets_save_to_file(packets):
+def save_packets_to_file(packets):
 
     if not os.path.exists(SESSIONS_DIR):
         os.mkdir(SESSIONS_DIR)
@@ -36,6 +36,26 @@ def packets_save_to_file(packets):
 
     with open(os.path.join(SESSIONS_DIR, filename), 'w') as file:
         file.write(txt)
+
+
+def read_packets_from_file(filename):
+    packets = []
+
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+
+    for line in lines:
+        packet_raw = line.split(' ')
+
+        quaternions = [float(q) for q in packet_raw[2:]]
+
+        packets.append(Packet(packet_raw[1], quaternions, packet_raw[0]))
+
+
+    print(str(len(packets)) + ' packets have been read.')
+
+    return packets
+
 
 
 class IMUSessionsManager:
@@ -54,7 +74,7 @@ class IMUSessionsManager:
 
             send_packets(packets)
 
-            packets_save_to_file(packets)
+            save_packets_to_file(packets)
 
             self.imu_sessions.clear()
 

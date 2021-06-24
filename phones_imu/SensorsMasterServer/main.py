@@ -1,11 +1,10 @@
-from datetime import datetime
-
 import keyboard
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
-from blender_interface import Packet, send_packet
+from blender_interface import Packet
 from Phone import Phone
-from IMUSessionsManager import IMUSessionsManager
+import IMUSessionsManager
+import argparse
 
 """
 Very simple HTTP server in python for logging requests
@@ -15,7 +14,14 @@ Usage::
 
 command = "STOP"
 
-merger = IMUSessionsManager()
+merger = IMUSessionsManager.IMUSessionsManager()
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-r', "--replay", type=str, help="Display the previously saved session. Pass a file as an argument.")
+
+    return parser.parse_args()
 
 
 def to_imu_packets(data) -> list[Packet]:
@@ -97,12 +103,13 @@ def set_command(cmd):
 
 
 if __name__ == '__main__':
-    from sys import argv
-
     keyboard.on_press_key("q", lambda _: set_command('STOP'))
     keyboard.on_press_key("s", lambda _: set_command('START'))
 
-    if len(argv) == 2:
-        run(port=int(argv[1]))
+    args = parse_args()
+
+    if args.replay:
+        packets = IMUSessionsManager.read_packets_from_file(args.replay)
+        IMUSessionsManager.send_packets(packets)
     else:
         run()
