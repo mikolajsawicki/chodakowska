@@ -30,7 +30,7 @@ class IMUSessionsManager:
 
             sleep(0.02)
 
-            if i > 0 and i % 10 == 0:
+            if i > 0 and i % 150 == 0:
                 print(str(i) + ' packets have been sent')
 
         print(str(len(packets)) + ' packets have been sent')
