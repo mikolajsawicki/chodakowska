@@ -24,7 +24,7 @@
 import socket
 import time
 from copp_server.osc4py3_buildparse import oscbuildparse as oscparse
-from quaternion_operations import rotate180z
+from quaternion_operations import *
 from Packet import Packet
 from time import sleep
 
@@ -38,9 +38,28 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def send_packets(packets):
 
-    # Rotate the quaternions - for compatibility with Blender addon
+    # Process the quaternions - for compatibility with Blender addon
     for i, packet in enumerate(packets):
-        packets[i].quaternion = rotate180z(packet.quaternion)
+
+        if packet.label == 'r-hand':
+            packets[i].quaternion = rotate90z(packets[i].quaternion)
+            packets[i].quaternion = swap_x_z_axis(packets[i].quaternion)
+            packets[i].quaternion = invert_axis(packets[i].quaternion, 'x')
+            packets[i].quaternion = invert_axis(packets[i].quaternion, 'y')
+
+        elif packet.label == 'r-arm':
+            packets[i].quaternion = rotate90z(packets[i].quaternion)
+            packets[i].quaternion = swap_x_z_axis(packets[i].quaternion)
+            packets[i].quaternion = invert_axis(packets[i].quaternion, 'x')
+            packets[i].quaternion = invert_axis(packets[i].quaternion, 'y')
+
+        elif packet.label == 'r-forarm':
+            packets[i].quaternion = rotate90z(packets[i].quaternion)
+            packets[i].quaternion = rotate180y(packets[i].quaternion)
+            packets[i].quaternion = swap_x_z_axis(packets[i].quaternion)
+            packets[i].quaternion = invert_axis(packets[i].quaternion, 'y')
+            packets[i].quaternion = invert_axis(packets[i].quaternion, 'z')
+
 
     for i, packet in enumerate(packets):
         send_packet(packet)

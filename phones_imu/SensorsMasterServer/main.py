@@ -5,7 +5,7 @@ from blender_interface import Packet
 from Phone import Phone
 import IMUSessionsManager
 import argparse
-from quaternion_operations import rotate180z
+
 
 """
 Very simple HTTP server in python for logging requests
@@ -14,13 +14,12 @@ Usage::
 """
 
 command = "STOP"
-
 merger = IMUSessionsManager.IMUSessionsManager()
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-r', "--replay", type=str, help="Display the previously saved session. Pass a file as an argument.")
+    parser.add_argument('-f', "--file", type=str, help="Display the previously saved session. Pass a file as an argument.")
 
     return parser.parse_args()
 
@@ -109,8 +108,9 @@ if __name__ == '__main__':
 
     args = parse_args()
 
-    if args.replay:
-        packets = IMUSessionsManager.read_packets_from_file(args.replay)
+    if args.file:
+        packets = IMUSessionsManager.read_packets_from_file(args.file)
         IMUSessionsManager.send_packets(packets)
     else:
+
         run()
