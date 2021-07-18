@@ -1,6 +1,6 @@
 # iLikeToMoveIT
 
-A simple motion capture system, which uses the IMU sensors located in multiple Android devices and the [chordata](https://www.chordata.cc "Chordata project's homepage") Blender addon.
+A simple motion capture system, which uses the IMUs located in multiple Android devices and the [chordata](https://www.chordata.cc "Chordata project's homepage") Blender addon.
 
 The project contains: 
 - an Android app for capturing data from the smartphone's IMU and passing it to the server
