@@ -67,7 +67,6 @@ def send_packets(packets):
 
 
 def send_packet(packet: Packet):
-    """ This function creates a dummy UDP server to send messages to the client. """
 
     test_timetag = time.time()
     test_timetag = oscparse.unixtime2timetag(0.001 * test_timetag)
