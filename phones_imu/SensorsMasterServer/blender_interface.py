@@ -41,13 +41,7 @@ def send_packets(packets):
     # Process the quaternions - for compatibility with Blender addon
     for i, packet in enumerate(packets):
 
-        if packet.label == 'r-hand':
-            packets[i].quaternion = rotate90z(packets[i].quaternion)
-            packets[i].quaternion = swap_x_z_axis(packets[i].quaternion)
-            packets[i].quaternion = invert_axis(packets[i].quaternion, 'x')
-            packets[i].quaternion = invert_axis(packets[i].quaternion, 'y')
-
-        elif packet.label == 'r-arm':
+        if packet.label in ['r-hand', 'r-arm']:
             packets[i].quaternion = rotate90z(packets[i].quaternion)
             packets[i].quaternion = swap_x_z_axis(packets[i].quaternion)
             packets[i].quaternion = invert_axis(packets[i].quaternion, 'x')
