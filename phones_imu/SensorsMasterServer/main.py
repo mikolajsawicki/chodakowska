@@ -7,12 +7,6 @@ import IMUSessionsManager
 import argparse
 
 
-"""
-Very simple HTTP server in python for logging requests
-Usage::
-    sudo python main.py
-"""
-
 command = "STOP"
 merger = IMUSessionsManager.IMUSessionsManager()
 
@@ -59,8 +53,7 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
-        # logging.info("GET")
+
         client_ip = self.client_address[0]
 
         if client_ip not in [phone.ip for phone in merger.phones]:
@@ -71,8 +64,8 @@ class S(BaseHTTPRequestHandler):
         self.wfile.write(bytes(command + '\n', "utf-8"))
 
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
-        post_data = self.rfile.read(content_length)  # <--- Gets the data itself
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
 
         logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
                      str(self.path), str(self.headers), post_data.decode('utf-8'))
